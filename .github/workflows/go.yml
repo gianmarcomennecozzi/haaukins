@@ -16,6 +16,8 @@ jobs:
           go-version: 1.13
         id: go
       - name: Downloading  dependencies
+        env:
+          GOPROXY: "https://proxy.golang.org"
         run: go mod download
 
       - name: Check out code into the Go module directory
