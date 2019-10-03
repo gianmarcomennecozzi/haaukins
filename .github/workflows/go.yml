@@ -22,4 +22,4 @@ jobs:
         run : go test -v --race ./...
 
       - name: Build
-        run: go build .scripts/deploy/build_binaries.go
+        run: go run ./scripts/deploy/build_binaries.go
