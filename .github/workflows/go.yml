@@ -4,7 +4,10 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
       - name: Set up Go 1.13
@@ -12,6 +15,8 @@ jobs:
         with:
           go-version: 1.13
         id: go
+      - name: Downloading  dependencies
+        run: go mod download
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -23,3 +28,12 @@ jobs:
 
       - name: Build
         run: go run ./scripts/deploy/build_binaries.go
+
+      - name: Benchmark
+        run: go test -v ./... -bench=./...  2>&1 | tee $GITHUB_WORKSPACE/latest-benchmarks.txt
+
+      - name: Upload bencmark artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: benchmark-report.txt
+          path: latest-benchmarks.txt
