@@ -31,3 +31,8 @@ jobs:
       with:
         name: benchmark-report.txt
         path: latest-benchmarks.txt
+   
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v1
+      with:
+        version: latest
