@@ -113,6 +113,16 @@ func (vm *vm) Run(ctx context.Context) error {
 	return vm.Start(ctx)
 }
 
+func (vm *vm ) Sleep() error {
+	_, err := VBoxCmdContext(context.TODO(),vboxCtrlVM,vm.id,"savestate")
+	if err !=nil {
+		log.Error().Msgf("Error while putting machine into sleep mode ! ")
+		return err
+	}
+	log.Debug().Msgf("Virtual machine has been added to saved state ; id = %s ",vm.id )
+	return nil
+}
+
 func (vm *vm) Start(ctx context.Context) error {
 	_, err := VBoxCmdContext(ctx, vboxStartVM, vm.id, "--type", "headless")
 	if err != nil {

@@ -160,6 +160,22 @@ func (e *exercise) Start(ctx context.Context) error {
 	return res
 }
 
+func (e *exercise) Sleep() error {
+	var res error
+	var wg sync.WaitGroup
+	for _, vi := range e.machines {
+		wg.Add(1)
+		go func(vi virtual.Instance) {
+			if err:= vi.Sleep(); err!=nil  {
+				log.Error().Msgf("Error happened on exercise.go sleep function ! %s",err)
+				res=err
+			}
+			wg.Done()
+		}(vi)
+	}
+	wg.Wait()
+	return res
+}
 func (e *exercise) Stop() error {
 	for _, m := range e.machines {
 		if err := m.Stop(); err != nil {

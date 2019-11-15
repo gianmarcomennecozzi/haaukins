@@ -31,6 +31,7 @@ func (c *Client) CmdEvent() *cobra.Command {
 		c.CmdEventStop(),
 		c.CmdEventList(),
 		c.CmdEventTeams(),
+		c.CmdSleep(),
 		c.CmdEventTeamRestart())
 
 	return cmd
@@ -219,6 +220,26 @@ func (c *Client) CmdEventTeams() *cobra.Command {
 		},
 	}
 }
+
+func (c *Client) CmdSleep() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "Sleep",
+		Short:   "Sleep-test",
+		Example: "hkn event sleep",
+		Args:    cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+			defer cancel()
+			_, err := c.rpcClient.Sleep(ctx, &pb.Empty{})
+			if err != nil {
+				PrintError(err)
+			}
+			//fmt.Println(resp.Msg)
+		},
+	}
+	return cmd
+}
+
 
 func (c *Client) CmdEventTeamRestart() *cobra.Command {
 	return &cobra.Command{

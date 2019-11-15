@@ -33,6 +33,7 @@ type Instance interface {
 	Run(context.Context) error
 	Stop() error
 	Info() InstanceInfo
+	Sleep() error
 	io.Closer
 }
 

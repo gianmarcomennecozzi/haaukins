@@ -6,9 +6,11 @@ package ctfd
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"github.com/aau-network-security/haaukins/event"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -517,6 +519,7 @@ func (cfi *checkFlagInterception) getTeamFromSession(r *http.Request) (store.Tea
 
 type loginInterception struct {
 	teamStore store.TeamStore
+	event event.Event
 }
 
 func NewLoginInterceptor(ts store.TeamStore) *loginInterception {
@@ -576,7 +579,20 @@ func (li *loginInterception) Intercept(next http.Handler) http.Handler {
 		if session != "" {
 			li.teamStore.CreateTokenForTeam(session, t)
 		}
+		// cycle import error
+		lab, ok := li.event.GetLabByTeam(t.Id)
+		if !ok {
+			log.Error().Msg("Error on getting lab in login interception....")
+			// todo return: error if lab is null
+		}
+		if err := lab.Start(context.TODO()); err!=nil {
+			log.Error().Err(err).Msg("Error while starting lab !! ")
+			//return err
+		}
+		// todo: fix cycle import error
+
 	})
+
 }
 
 var (

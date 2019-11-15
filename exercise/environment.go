@@ -27,6 +27,7 @@ type Environment interface {
 	InstanceInfo() []virtual.InstanceInfo
 	Start(context.Context) error
 	Stop() error
+	Sleep() error
 	io.Closer
 }
 
@@ -137,6 +138,29 @@ func (ee *environment) Stop() error {
 		}
 	}
 
+	return nil
+}
+
+func (ee *environment) Sleep() error {
+	if err := ee.dhcpServer.Stop(); err!=nil {
+		log.Error().Err(err).Msg("Error on stopping dhcp server ")
+		return err
+	}
+	log.Debug().Msg("DHCP container is stopped ! ")
+
+	if err := ee.dnsServer.Stop(); err!=nil {
+		log.Error().Err(err).Msg("Error on stopping DNS server")
+		return err
+	}
+	log.Debug().Msg("DNS container is stopped ! ")
+
+	for _, e := range ee.exercises {
+		if err := e.Sleep(); err!=nil {
+			log.Error().Msgf("Error happened environment.go sleep function %s",err)
+			return err
+		}
+		log.Debug().Msgf("Killing exercises ....")
+	}
 	return nil
 }
 

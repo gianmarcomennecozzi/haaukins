@@ -629,6 +629,37 @@ func (d *daemon) RestartTeamLab(req *pb.RestartTeamLabRequest, resp pb.Daemon_Re
 	return nil
 }
 
+func (d *daemon) Sleep(ctx context.Context, req *pb.Empty) (*pb.Empty,error){
+	now := time.Now()
+
+	for _, e := range  d.eventPool.GetAllEvents(){
+		for _,t := range  e.GetTeams() {
+			lastAccessedTime , err := time.Parse(displayTimeFormat, t.AccessedAt.Format(displayTimeFormat))
+			if err!=nil {
+				log.Error().Msgf("Error while parsing time %v",err)
+				return nil, err
+			}
+			if now.Sub(lastAccessedTime).Minutes() > 2.0 {
+				lab, ok := e.GetLabByTeam(t.Id)
+				if !ok {
+					log.Error().Msgf("Could not find lab by team  ")
+				}
+				if lab!=nil {
+					if err:=lab.Sleep(); err!=nil {
+						log.Error().Msgf("Error while trying to close it .... ")
+						return nil, err
+					}
+				}
+				log.Info().Msg("Adding team lab into sleep mode... ")
+			}
+		}
+	}
+	return req, nil
+
+}
+
+
+
 func (d *daemon) ListExercises(ctx context.Context, req *pb.Empty) (*pb.ListExercisesResponse, error) {
 	var exercises []*pb.ListExercisesResponse_Exercise
 

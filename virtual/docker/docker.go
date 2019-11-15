@@ -316,6 +316,22 @@ func (c *container) getCreateConfig() (*docker.CreateContainerOptions, error) {
 	}, nil
 }
 
+func (c *container) Sleep () error {
+	opts := docker.KillContainerOptions{
+		ID:      c.id,
+		Signal:  0,
+		Context: context.TODO(),
+	}
+	log.Info().Msgf("Killing docker container %s",opts.ID)
+	if err:= DefaultClient.KillContainer(opts);
+	err!=nil {
+		log.Error().Msgf("Error while killing (sleeping ) the container .... ")
+		return err
+	}
+	log.Debug().Msgf("Docker container is killed %s ",opts.ID)
+	return nil
+}
+
 func (c *container) Create(ctx context.Context) error {
 	dconf, err := c.getCreateConfig()
 	if err != nil {

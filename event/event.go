@@ -285,7 +285,6 @@ func (ev *event) AssignLab(t *store.Team, lab lab.Lab) error {
 	}
 
 	ev.labs[t.Id] = lab
-
 	chals := lab.Environment().Challenges()
 	for _, chal := range chals {
 		t.AddChallenge(chal)
@@ -293,6 +292,7 @@ func (ev *event) AssignLab(t *store.Team, lab lab.Lab) error {
 			Str("chal-val", chal.FlagValue).
 			Msgf("Flag is created for team %s [assignlab function] ", t.Name)
 	}
+	t.AddLabInfo(lab.InstanceInfo())
 
 	return nil
 }
