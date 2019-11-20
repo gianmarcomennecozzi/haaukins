@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 	pb "github.com/aau-network-security/haaukins/daemon/proto"
-	"github.com/aau-network-security/haaukins/event"
 	"github.com/aau-network-security/haaukins/logging"
 	"github.com/aau-network-security/haaukins/store"
+	"github.com/aau-network-security/haaukins/svcs/ctfd"
 	"github.com/aau-network-security/haaukins/virtual/docker"
 	"github.com/aau-network-security/haaukins/virtual/vbox"
 	dockerclient "github.com/fsouza/go-dockerclient"
@@ -183,9 +183,9 @@ type daemon struct {
 	auth      Authenticator
 	users     store.UsersFile
 	exercises store.ExerciseStore
-	eventPool *eventPool
+	eventPool *EventPool
 	frontends store.FrontendStore
-	ehost     event.Host
+	ehost     ctfd.Host
 	logPool   logging.Pool
 	closers   []io.Closer
 	magic     *certmagic.Config
@@ -280,7 +280,7 @@ func New(conf *Config) (*daemon, error) {
 		exercises: ef,
 		eventPool: eventPool,
 		frontends: ff,
-		ehost:     event.NewHost(vlib, ef, efh),
+		ehost:     ctfd.NewHost(vlib, ef, efh),
 		logPool:   logPool,
 		closers:   []io.Closer{logPool, eventPool},
 		magic:     magic,
@@ -474,7 +474,7 @@ func (d *daemon) createEventFromEventFile(ctx context.Context, ef store.EventFil
 }
 
 // INITIAL POINT OF CREATE EVENT FUNCTION, IT INITIALIZE EVENT AND ADDS EVENTPOOL
-func (d *daemon) startEvent(ev event.Event) {
+func (d *daemon) startEvent(ev ctfd.Event) {
 	conf := ev.GetConfig()
 
 	var frontendNames []string
@@ -590,7 +590,7 @@ func (d *daemon) StopEvent(req *pb.StopEventRequest, resp pb.Daemon_StopEventSer
 	if err != nil {
 		return err
 	}
-	// tag of the event is removed from eventPool
+	// tag of the event is removed from EventPool
 	if err := d.eventPool.RemoveEvent(evtag); err != nil {
 		return err
 	}

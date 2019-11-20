@@ -2,7 +2,7 @@
 // Use of this source code is governed by a GPLv3
 // license that can be found in the LICENSE file.
 
-package event
+package ctfd
 
 import (
 	"context"
@@ -16,7 +16,6 @@ import (
 
 	"github.com/aau-network-security/haaukins/lab"
 	"github.com/aau-network-security/haaukins/store"
-	"github.com/aau-network-security/haaukins/svcs/ctfd"
 	"github.com/aau-network-security/haaukins/svcs/guacamole"
 	"github.com/aau-network-security/haaukins/virtual/docker"
 	"github.com/aau-network-security/haaukins/virtual/vbox"
@@ -121,7 +120,7 @@ type Event interface {
 }
 
 type event struct {
-	ctfd   ctfd.CTFd
+	ctfd   CTFd
 	guac   guacamole.Guacamole
 	labhub lab.Hub
 
@@ -137,13 +136,13 @@ type event struct {
 
 func NewEvent(ctx context.Context, ef store.EventFile, hub lab.Hub, flags []store.FlagConfig) (Event, error) {
 	conf := ef.Read()
-	ctfdConf := ctfd.Config{
+	ctfdConf := Config{
 		Name:  conf.Name,
 		Flags: flags,
 		Teams: ef.GetTeams(),
 	}
 
-	ctf, err := ctfd.New(ctx, ctfdConf)
+	ctf, err := New(ctx, ctfdConf)
 	if err != nil {
 		return nil, err
 	}
@@ -292,8 +291,6 @@ func (ev *event) AssignLab(t *store.Team, lab lab.Lab) error {
 			Str("chal-val", chal.FlagValue).
 			Msgf("Flag is created for team %s [assignlab function] ", t.Name)
 	}
-	t.AddLabInfo(lab.InstanceInfo())
-
 	return nil
 }
 

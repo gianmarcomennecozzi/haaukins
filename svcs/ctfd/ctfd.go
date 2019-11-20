@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/aau-network-security/haaukins/daemon"
 	"io/ioutil"
 	"mime/multipart"
 	"net"
@@ -70,6 +71,7 @@ type ctfd struct {
 	users    []*user
 	relation map[string]*user
 	flagPool *FlagPool
+	eventPool *daemon.EventPool
 }
 
 type user struct {
@@ -213,7 +215,7 @@ func (ctf *ctfd) ProxyHandler(hooks ...func(*store.Team) error) svcs.ProxyConnec
 		itc := svcs.Interceptors{
 			NewRegisterInterception(es, regOpts...),
 			NewCheckFlagInterceptor(es, ctf.flagPool),
-			NewLoginInterceptor(es),
+			NewLoginInterceptor(es,ctf.eventPool),
 		}
 
 		if ctf.theme.ExtraFields != nil {

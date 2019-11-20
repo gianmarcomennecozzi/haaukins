@@ -3,7 +3,7 @@
 // Use of this source code is governed by a GPLv3
 // license that can be found in the LICENSE file.
 
-package event
+package ctfd
 
 import (
 	"context"
@@ -13,7 +13,6 @@ import (
 	"github.com/aau-network-security/haaukins/exercise"
 	"github.com/aau-network-security/haaukins/lab"
 	"github.com/aau-network-security/haaukins/store"
-	"github.com/aau-network-security/haaukins/svcs/ctfd"
 	"github.com/aau-network-security/haaukins/svcs/guacamole"
 	"github.com/aau-network-security/haaukins/virtual/docker"
 )
@@ -27,7 +26,7 @@ const (
 
 type testCtfd struct {
 	status int
-	ctfd.CTFd
+	ctfd CTFd
 }
 
 func (ctf *testCtfd) Start(ctx context.Context) error {

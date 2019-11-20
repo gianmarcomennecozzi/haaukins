@@ -278,7 +278,6 @@ func (es *teamstore) CreateTokenForTeam(token string, in Team) error {
 	}
 
 	es.tokens[token] = t.Id
-
 	return nil
 }
 

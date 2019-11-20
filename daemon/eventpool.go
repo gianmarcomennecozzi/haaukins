@@ -5,32 +5,32 @@
 package daemon
 
 import (
+	"github.com/aau-network-security/haaukins/svcs/ctfd"
 	"net/http"
 	"strings"
 	"sync"
 
-	"github.com/aau-network-security/haaukins/event"
 	"github.com/aau-network-security/haaukins/store"
 )
 
-type eventPool struct {
+type EventPool struct {
 	m               sync.RWMutex
 	host            string
 	notFoundHandler http.Handler
-	events          map[store.Tag]event.Event
+	events          map[store.Tag]ctfd.Event
 	handlers        map[store.Tag]http.Handler
 }
 
-func NewEventPool(host string) *eventPool {
-	return &eventPool{
+func NewEventPool(host string) *EventPool {
+	return &EventPool{
 		host:            host,
 		notFoundHandler: notFoundHandler(),
-		events:          map[store.Tag]event.Event{},
+		events:          map[store.Tag]ctfd.Event{},
 		handlers:        map[store.Tag]http.Handler{},
 	}
 }
 
-func (ep *eventPool) AddEvent(ev event.Event) {
+func (ep *EventPool) AddEvent(ev ctfd.Event) {
 	tag := ev.GetConfig().Tag
 
 	ep.m.Lock()
@@ -40,7 +40,7 @@ func (ep *eventPool) AddEvent(ev event.Event) {
 	ep.handlers[tag] = ev.Handler()
 }
 
-func (ep *eventPool) RemoveEvent(t store.Tag) error {
+func (ep *EventPool) RemoveEvent(t store.Tag) error {
 	ep.m.Lock()
 	defer ep.m.Unlock()
 
@@ -54,7 +54,7 @@ func (ep *eventPool) RemoveEvent(t store.Tag) error {
 	return nil
 }
 
-func (ep *eventPool) GetEvent(t store.Tag) (event.Event, error) {
+func (ep *EventPool) GetEvent(t store.Tag) (ctfd.Event, error) {
 	ep.m.RLock()
 	ev, ok := ep.events[t]
 	ep.m.RUnlock()
@@ -65,8 +65,8 @@ func (ep *eventPool) GetEvent(t store.Tag) (event.Event, error) {
 	return ev, nil
 }
 
-func (ep *eventPool) GetAllEvents() []event.Event {
-	events := make([]event.Event, len(ep.events))
+func (ep *EventPool) GetAllEvents() []ctfd.Event {
+	events := make([]ctfd.Event, len(ep.events))
 
 	var i int
 	ep.m.RLock()
@@ -79,7 +79,7 @@ func (ep *eventPool) GetAllEvents() []event.Event {
 	return events
 }
 
-func (ep *eventPool) Close() error {
+func (ep *EventPool) Close() error {
 	var firstErr error
 
 	for _, ev := range ep.events {
@@ -91,7 +91,7 @@ func (ep *eventPool) Close() error {
 	return firstErr
 }
 
-func (ep *eventPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ep *EventPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	domainParts := strings.SplitN(r.Host, ".", 2)
 
 	if len(domainParts) != 2 {

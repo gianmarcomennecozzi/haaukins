@@ -6,6 +6,7 @@ package daemon
 
 import (
 	"fmt"
+	"github.com/aau-network-security/haaukins/svcs/ctfd"
 	"io"
 	"net"
 	"net/http"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/aau-network-security/haaukins/app/client/cli"
 	pb "github.com/aau-network-security/haaukins/daemon/proto"
-	"github.com/aau-network-security/haaukins/event"
 	"github.com/aau-network-security/haaukins/exercise"
 	"github.com/aau-network-security/haaukins/lab"
 	"github.com/aau-network-security/haaukins/store"
@@ -354,15 +354,15 @@ func TestLoginUser(t *testing.T) {
 }
 
 type fakeEventHost struct {
-	event event.Event
-	event.Host
+	event ctfd.Event
+	ctfd.Host
 }
 
-func (eh fakeEventHost) CreateEventFromConfig(context.Context, store.EventConfig) (event.Event, error) {
+func (eh fakeEventHost) CreateEventFromConfig(context.Context, store.EventConfig) (ctfd.Event, error) {
 	return eh.event, nil
 }
 
-func (eh fakeEventHost) CreateEventFromEventFile(context.Context, store.EventFile) (event.Event, error) {
+func (eh fakeEventHost) CreateEventFromEventFile(context.Context, store.EventFile) (ctfd.Event, error) {
 	return eh.event, nil
 }
 
@@ -376,7 +376,7 @@ type fakeEvent struct {
 	teams     []store.Team
 	lab       *fakeLab
 	conf      store.EventConfig
-	event.Event
+	ctfd.Event
 }
 
 func (fe *fakeEvent) Start(context.Context) error {
