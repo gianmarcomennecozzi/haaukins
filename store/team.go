@@ -20,7 +20,7 @@ type TeamStore interface {
 	GetTeamByEmail(string) (*haaukins.Team, error)
 	GetTeams() []*haaukins.Team
 
-	CreateTokenForTeam(string, *haaukins.Team) (*haaukins.Team,error) // todo: implement me
+	CreateTokenForTeam(string, *haaukins.Team) error // todo: implement me
 	//DeleteToken(string) error // todo: implement me
 }
 
@@ -114,28 +114,22 @@ func (es *teamstore) SaveTeam(t *haaukins.Team) error {
 		es.m.Unlock()
 		return ErrEmailAlreadyExists
 	}
-
+	es.emails[email] = t.ID()
 	es.teams[t.ID()] = t
 	es.m.Unlock()
 
 	return es.RunHooks()
 }
 
-func(es *teamstore) CreateTokenForTeam (token string, in *haaukins.Team) (*haaukins.Team,error) {
+func(es *teamstore) CreateTokenForTeam (token string, in *haaukins.Team) error {
 	es.m.Lock()
 	defer es.m.Unlock()
 	if token == "" {
-		return &haaukins.Team{}, &EmptyVarErr{Var:"Token"}
+		return &EmptyVarErr{Var:"Token"}
 	}
-	t, ok := es.teams[in.ID()]
-	if !ok {
-		return &haaukins.Team{},UnknownTeamErr
-	}
-	es.tokens[token]= t.ID()
-	for _, x := range es.tokens {
-		log.Debug().Msgf("For element %s, team id %s  token %s ", x, t.ID(),token)
-	}
-	return t,nil
+	es.tokens[token]= in.ID()
+
+	return nil
 }
 
 func (es *teamstore) GetTeamByID(id string) (*haaukins.Team, error) {

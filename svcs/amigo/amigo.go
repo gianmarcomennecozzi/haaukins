@@ -115,7 +115,7 @@ func (am *Amigo) Handler(hook func(t *haaukins.Team) error,guacHandler http.Hand
 	m.Handle("/guacamole/", guacHandler)
 
 
-	m.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/public"))))
+	m.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/public"))))
 
 	return m
 }
@@ -124,9 +124,9 @@ func (am *Amigo) Handler(hook func(t *haaukins.Team) error,guacHandler http.Hand
 
 func (am *Amigo) handleIndex() http.HandlerFunc {
 	tmpl, err := template.ParseFiles(
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/base.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/index.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/base.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/index.tmpl.html",
 	)
 	if err != nil {
 		log.Println("error index tmpl: ", err)
@@ -147,9 +147,9 @@ func (am *Amigo) handleIndex() http.HandlerFunc {
 
 func (am *Amigo) handleChallenges() http.HandlerFunc {
 	tmpl, err := template.ParseFiles(
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/base.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/index.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/base.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/index.tmpl.html",
 	)
 	if err != nil {
 		log.Println("error index tmpl: ", err)
@@ -246,9 +246,9 @@ func (am *Amigo) handleSignup(hook func(t *haaukins.Team) error) http.HandlerFun
 
 func (am *Amigo) handleSignupGET() http.HandlerFunc {
 	tmpl, err := template.ParseFiles(
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/base.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/signup.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/base.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/signup.tmpl.html",
 	)
 	if err != nil {
 		log.Println("error index tmpl: ", err)
@@ -263,9 +263,9 @@ func (am *Amigo) handleSignupGET() http.HandlerFunc {
 
 func (am *Amigo) handleSignupPOST(hook func(t *haaukins.Team) error) http.HandlerFunc {
 	tmpl, err := template.ParseFiles(
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/base.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/signup.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/base.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/signup.tmpl.html",
 	)
 	if err != nil {
 		log.Println("error index tmpl: ", err)
@@ -342,8 +342,7 @@ func (am *Amigo) handleSignupPOST(hook func(t *haaukins.Team) error) http.Handle
 		//if err := am.TeamStore.CreateTokenForTeam(token,t); err !=nil {
 		//	logger.Debug().Msgf("Create Token For TEAM ERROR ! %s", err)
 		//}
-		team,err := am.TeamStore.CreateTokenForTeam(token,t)
-		if err != nil {
+		if err := am.TeamStore.CreateTokenForTeam(token,t); err != nil {
 			logger.Debug().Msgf("Create token for team error %s",err)
 			return
 		}
@@ -355,7 +354,7 @@ func (am *Amigo) handleSignupPOST(hook func(t *haaukins.Team) error) http.Handle
 		//	return
 		//}
 		// assign lab !!!
-		if err := hook(team); err != nil { // assigning lab
+		if err := hook(t); err != nil { // assigning lab
 			logger.Debug().Msgf("Problem in assing lab !! %s ", err)
 		}
 	}
@@ -382,9 +381,9 @@ func (am *Amigo) handleLogin() http.HandlerFunc {
 
 func (am *Amigo) handleLoginGET() http.HandlerFunc {
 	tmpl, err := template.ParseFiles(
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/base.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/login.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/base.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/login.tmpl.html",
 	)
 	if err != nil {
 		log.Println("error login tmpl: ", err)
@@ -399,9 +398,9 @@ func (am *Amigo) handleLoginGET() http.HandlerFunc {
 
 func (am *Amigo) handleLoginPOST() http.HandlerFunc {
 	tmpl, err := template.ParseFiles(
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/base.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
-		"/home/ahmet/haaukins_main/haaukins/svcs/amigo/resources/private/login.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/base.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/navbar.tmpl.html",
+		"/scratch/go/src/github.com/aau-network-security/haaukins/svcs/amigo/resources/private/login.tmpl.html",
 	)
 	if err != nil {
 		log.Println("error login tmpl: ", err)
